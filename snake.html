@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Snake</title>
+        
+        <!-- Stylesheet -->
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            
+            html, body {
+                width: 100%;
+                height: 100%;
+            }
+            
+            body {
+                align-content: space-around;
+                justify-content: center;
+                display: grid;
+                background-color: #76b5c5;
+                color: #063970;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Slither Worm</h1>
+        <canvas id="gameCanvas" width=400, height=400></canvas>
+        <h2>Controls</h2>
+        <p>
+            Left arrow: Go left <br>
+            Right arrow: Go right <br>
+            Up arrow: Go up <br>
+            Down arrow: Go down <br>
+        </p>
+        <script>
+            window.onload = function() {
+                const canvas = document.getElementById("gameCanvas");
+                const ctx = canvas.getContext("2d");
+                const FPS = 10;
+                const gridWidth = canvas.width / 20;
+                const gridHeight = canvas.width / 20;
+
+                setInterval(update, 1000 / FPS);
+                
+                class Cell {
+                    constructor(x, y) {
+                        this._x = x;
+                        this._y = y;
+                    }
+                    
+                    get x() {
+                        return this._x;
+                    }
+                    
+                    get y() {
+                        return this._y;
+                    }
+                }
+                
+                let snake = newSnake();
+                let apple = newApple();
+                
+                function keyDown(event) {
+                    if (event.keyCode == 37 && snake.tailPos[0].x > snake.tailPos[1].x) {
+                        return;
+                    }
+                    if (event.keyCode == 38 && snake.tailPos[0].y > snake.tailPos[1].y) {
+                        return;
+                    }
+                    if (event.keyCode == 39 && snake.tailPos[0].x < snake.tailPos[1].x) {
+                        return;
+                    }
+                    if (event.keyCode == 40 && snake.tailPos[0].y < snake.tailPos[1].y) {
+                        return;
+                    }
+                    
+                    switch(event.keyCode) {
+                        case 37:
+                            snake.xv = -1;
+                            snake.yv = 0;
+                            break;
+                        case 38:
+                            snake.xv = 0;
+                            snake.yv = -1;
+                            break;
+                        case 39:
+                            snake.xv = 1;
+                            snake.yv = 0;
+                            break;
+                        case 40:
+                            snake.xv = 0;
+                            snake.yv = 1;
+                            break;
+                    }
+                }
+                
+                function newSnake() {
+                    return {
+                        x: 7,
+                        y: 10,
+                        xv: 1,
+                        yv: 0,
+                        tailPos: [new Cell(this.x, this.y), new Cell(this.x, this.y)],
+                        cellWidth: gridWidth - 2,
+                        cellHeight: gridHeight - 2
+                    };
+                }
+                
+                function newApple() {
+                    return {
+                        x: 15,
+                        y: 10,
+                        width: gridHeight - 2,
+                        height: gridHeight - 2
+                    }
+                }
+                
+                function endgame() {
+                    snake = newSnake();
+                    apple = newApple();
+                }
+                
+                function update() {
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    snake.x += snake.xv;
+                    snake.y += snake.yv;
+                    snake.tailPos.unshift(new Cell(snake.x, snake.y));
+                    snake.tailPos.pop();
+                    
+                    if (snake.x == apple.x && snake.y == apple.y) {
+                        snake.tailPos.push(new Cell(snake.x, snake.y));
+                        apple.x = Math.floor(gridWidth * Math.random());
+                        apple.y = Math.floor(gridHeight * Math.random());
+                        for (let i = 0; i < snake.tailPos.length; i++) {
+                            if (apple.x == snake.tailPos[i].x && apple.y == snake.tailPos[i].y) {
+                                apple.x == Math.floor(gridWidth * Math.random());
+                                apple.y = Math.floor(gridHeight * Math.random());
+                                i = -1;
+                            }
+                        }
+                    }
+                    
+                    ctx.fillStyle = "red";
+                    ctx.fillRect(apple.x * gridHeight + 1, apple.y * gridHeight + 1, apple.width, apple.height);
+                    
+                    
+                    ctx.fillStyle = "green";
+                    for (let i = 0; i < snake.tailPos.length; i++) {
+                        ctx.fillRect(snake.tailPos[i].x * gridHeight + 1, snake.tailPos[i].y * gridHeight + 1, snake.cellWidth, snake.cellHeight);
+                        
+                        if (i != 0 && i != snake.tailPos.length - 1 && snake.x == snake.tailPos[i].x && snake.y == snake.tailPos[i].y) {
+                            endgame();
+                        }
+                        
+                        if (snake.x < 0 || snake.x > 19) {
+                            endgame();
+                        } else if (snake.y < 0 || snake.y > 19) {
+                            endgame();
+                        }
+                    }
+                }
+                
+                window.addEventListener("keydown", keyDown);
+            };
+        </script>
+    </body>
+</html>
