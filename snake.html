@@ -4,6 +4,9 @@
         <meta charset="UTF-8">
         <title>Snake</title>
         
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="snake.png">
+      
         <!-- Stylesheet -->
         <style>
             * {
@@ -104,7 +107,7 @@
                         y: 10,
                         xv: 1,
                         yv: 0,
-                        tailPos: [new Cell(this.x, this.y), new Cell(this.x, this.y)],
+                        tailPos: [new Cell(this.x, this.y), new Cell(this.x - 1, this.y)],
                         cellWidth: gridWidth - 2,
                         cellHeight: gridHeight - 2
                     };
@@ -134,7 +137,7 @@
                     snake.tailPos.pop();
                     
                     if (snake.x == apple.x && snake.y == apple.y) {
-                        snake.tailPos.push(new Cell(snake.x, snake.y));
+                        snake.tailPos.push(new Cell(snake.tailPos[snake.tailPos.length - 1].x, snake.tailPos[snake.tailPos.length - 1].y));
                         apple.x = Math.floor(gridWidth * Math.random());
                         apple.y = Math.floor(gridHeight * Math.random());
                         for (let i = 0; i < snake.tailPos.length; i++) {
@@ -154,7 +157,7 @@
                     for (let i = 0; i < snake.tailPos.length; i++) {
                         ctx.fillRect(snake.tailPos[i].x * gridHeight + 1, snake.tailPos[i].y * gridHeight + 1, snake.cellWidth, snake.cellHeight);
                         
-                        if (i != 0 && i != snake.tailPos.length - 1 && snake.x == snake.tailPos[i].x && snake.y == snake.tailPos[i].y) {
+                        if (i != 0 && snake.x == snake.tailPos[i].x && snake.y == snake.tailPos[i].y) {
                             endgame();
                         }
                         
